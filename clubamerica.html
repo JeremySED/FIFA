@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CLUB AMÉRICA XI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            overflow-y: scroll;
+            min-height: 100vh;
+            background: #000;
+            position: relative;
+        }
+
+        /* Contenedor principal con el fondo animado */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, #00205B, #FECB00, #D50A0A, #00205B);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Contenedores de serpentinas (Cinta de campeones) */
+        .serpentinas-container-behind,
+        .serpentinas-container-front {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .serpentinas-container-behind {
+            z-index: -1;
+        }
+        .serpentinas-container-front {
+            z-index: 4;
+        }
+
+        .serpentina-cubo {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            opacity: 0.8;
+            border-radius: 2px;
+            transform: rotateZ(var(--rotation)) translate3d(0, 0, 0);
+            animation: fall-cubo linear infinite;
+        }
+
+        @keyframes fall-cubo {
+            0% {
+                transform: translateY(-100px) rotateZ(var(--rotation-start));
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotateZ(var(--rotation-end));
+                opacity: 0;
+            }
+        }
+
+        /* Título del Club */
+        .titulo-club {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5em;
+            font-weight: 900;
+            color: #FECB00; /* Amarillo/Crema */
+            text-shadow: 
+                -3px -3px 0 #00205B, /* Azul */
+                3px -3px 0 #ffffff,
+                -3px 3px 0 #ffffff,
+                3px 3px 0 #D50A0A, /* Rojo */
+                0 0 40px rgba(254, 203, 0, 0.8);
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 5px;
+            animation: color-shift 4s infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes color-shift {
+            from { text-shadow: -3px -3px 0 #00205B, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #D50A0A, 0 0 40px rgba(254, 203, 0, 0.8); }
+            to { text-shadow: -3px -3px 0 #D50A0A, 3px -3px 0 #00205B, -3px 3px 0 #00205B, 3px 3px 0 #D50A0A, 0 0 50px rgba(255, 255, 255, 0.9); }
+        }
+
+        /* Franjas Laterales */
+        .franja-lateral {
+            content: "";
+            position: fixed;
+            top: 0;
+            width: 80px;
+            height: 100%;
+            background: linear-gradient(135deg, #00205B, #FECB00, #00205B, #D50A0A);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
+        .franja-lateral[style*="left"] { left: 0; }
+        .franja-lateral[style*="right"] { right: 0; }
+
+        .cancha {
+            position: relative;
+            width: 1200px;
+            height: 1850px;
+            margin: 20px auto;
+            background: url("barcelona/cancha.jpg") no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.9) contrast(1.1) saturate(1.1);
+            border: 6px solid #00205B;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            z-index: 2;
+        }
+
+        .jugador {
+            position: absolute;
+            width: 180px;
+            cursor: pointer;
+            transition: transform 0.4s, filter 0.4s;
+            filter: drop-shadow(0 0 15px #000000);
+            z-index: 3;
+        }
+
+        .jugador:hover {
+            transform: scale(1.3) rotate(-2deg);
+            filter: drop-shadow(0 0 25px #FECB00);
+        }
+
+        /* --- ESTILOS DEL POPUP GRANDE CON ANIMACIÓN SIMPLE --- */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .popup-card {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 800px;
+            display: flex;
+            background-color: rgba(18, 18, 18, 0.9);
+            color: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s ease;
+            z-index: 1000;
+            opacity: 0;
+            text-align: left;
+        }
+        
+        /* Animación de entrada del popup */
+        .popup-overlay.active .popup-card {
+            transform: translate(-50%, -50%) scale(1);
+            top: 50%;
+            opacity: 1;
+        }
+        
+        /* Animación de salida del popup */
+        .popup-overlay.closing .popup-card {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+        }
+        .popup-overlay.closing {
+            opacity: 0;
+        }
+
+        .popup-info-content {
+            flex-grow: 1;
+            padding-right: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .popup-info-content h3 {
+            margin-top: 0;
+            font-size: 2.5em;
+            color: #FECB00;
+            text-shadow: 0 0 15px rgba(254, 203, 0, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .popup-info-content p {
+            margin: 8px 0;
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+
+        .popup-epic-quote {
+            margin-top: 30px;
+            font-style: italic;
+            color: #d1d1d1;
+            font-size: 1.4em;
+            border-left: 5px solid #00205B;
+            padding-left: 20px;
+            text-align: left;
+        }
+        
+        .popup-image-container {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 350px;
+            height: 350px;
+            position: relative;
+        }
+
+        #popup-image {
+            width: 100%; 
+            height: 100%;
+            object-fit: contain; 
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            transform: rotateY(-360deg);
+            opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.6s ease-in;
+        }
+
+        .popup-overlay.active #popup-image {
+            transform: rotateY(0deg);
+            opacity: 1;
+            transition-delay: 0.2s; /* Pequeño retraso para que aparezca después del popup */
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3em;
+            color: #FECB00;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+            z-index: 1002;
+            text-shadow: 0 0 15px rgba(254, 203, 0, 0.8);
+        }
+        .close-btn:hover {
+            color: #ffffff;
+            transform: rotate(90deg);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-background"></div>
+    <div class="franja-lateral" style="left: 0;"></div>
+    <div class="franja-lateral" style="right: 0;"></div>
+
+    <div class="serpentinas-container-behind" id="serpentinas-container-behind"></div>
+    <div class="serpentinas-container-front" id="serpentinas-container-front"></div>
+    
+    <h1 class="titulo-club">CLUB AMÉRICA</h1>
+
+    <div class="cancha">
+        <img src="america/malagon.jpg" class="jugador" style="top:85%; left: 513px;" data-info="Luis Malagón | Edad: 27 | Portero | Reflejos: Espectaculares | Un portero con gran capacidad de reacción y reflejos impresionantes. Aporta seguridad y confianza al arco.">
+        
+        <img src="america/chicotecalderon.jpg" class="jugador" style="top:70%; left:73px;" data-info="Cristian 'Chicote' Calderón | Edad: 27 | Lateral Izquierdo | Proyección: Recorrido | Un lateral con gran recorrido ofensivo y capacidad para sumarse al ataque constantemente.">
+        <img src="america/caceres.webp" class="jugador" style="top:70%; left:335px;" data-info="Sebastián Cáceres | Edad: 25 | Defensa Central Izq | Anticipación: Solidez | Un central uruguayo con buena anticipación, solidez en el juego terrestre y liderazgo en la zaga.">
+        <img src="america/lichnovsky.webp" class="jugador" style="top:70%; left:683px;" data-info="Igor Lichnovsky | Edad: 30 | Defensa Central Der | Experiencia: Calma | Un central chileno con experiencia, que utiliza su buen manejo de balón para dar calma en la salida.">
+        <img src="america/kevinalvarez.jpg" class="jugador" style="top:70%; left:947px;" data-info="Kevin Álvarez | Edad: 25 | Lateral Derecho | Velocidad: Desborde | Un lateral derecho con una velocidad endemoniada y gran habilidad para el desborde por la banda.">
+
+        <img src="america/jdosantos.jpg" class="jugador" style="top:55%; left:400px;" data-info="Jonathan dos Santos | Edad: 34 | Mediocentro Defensivo | Equilibrio: Pase | Un volante de contención que aporta equilibrio, recuperación y un primer pase limpio para iniciar la ofensiva.">
+        <img src="america/fidalgo.jpg" class="jugador" style="top:55%; left:626px;" data-info="Álvaro Fidalgo | Edad: 27 | Mediocentro Interior | Motor: Visión | El 'Maguito' español. El motor del equipo, combina una incansable dinámica con gran visión y técnica.">
+
+        <img src="america/quinones.png" class="jugador" style="top:35%; left:176px;" data-info="Julián Quiñones | Edad: 27 | Extremo Izquierdo | Poder: Goleador | Un atacante físico y potente con un olfato goleador increíble. Desequilibra y finaliza desde la izquierda.">
+        <img src="america/valdes.webp" class="jugador" style="top:35%; left:513px;" data-info="Diego Valdés | Edad: 30 | Mediocentro Ofensivo | Habilidad: Cerebro | El '10' chileno. Su habilidad con el balón, visión de juego y pases filtrados son el enlace del ataque.">
+        <img src="america/zendejas.png" class="jugador" style="top:35%; left:850px;" data-info="Alejandro Zendejas | Edad: 26 | Extremo Derecho | Regate: Precisión | Un extremo vertical que utiliza su regate para abrir espacios y que posee una gran precisión en sus disparos.">
+
+        <img src="america/henrymartin.jpg" class="jugador" style="top:18%; left: 513px;" data-info="Henry Martín | Edad: 31 | Delantero Centro / Capitán | Gol: Líder | El capitán y referente en el ataque. Su lucha incansable y su capacidad goleadora lo hacen el '9' titular.">
+    </div>
+
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup-card" id="popup-card">
+            <span class="close-btn" id="close-btn">&times;</span>
+            <div class="popup-info-content">
+                <h3 id="popup-name"></h3>
+                <p id="popup-details"></p> 
+                <p class="popup-epic-quote" id="popup-epic-quote"></p> 
+            </div>
+            <div class="popup-image-container">
+                <img id="popup-image" src="" alt="Jugador">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const jugadores = document.querySelectorAll(".jugador");
+        const popupOverlay = document.getElementById("popup-overlay");
+        const popupCard = document.getElementById("popup-card");
+        const closeBtn = document.getElementById("close-btn");
+        const popupImage = document.getElementById("popup-image");
+        const popupName = document.getElementById("popup-name");
+        const popupDetails = document.getElementById("popup-details");
+        const popupEpicQuote = document.getElementById("popup-epic-quote");
+        
+        jugadores.forEach(jugador => {
+            jugador.addEventListener("click", () => {
+                const info = jugador.getAttribute("data-info");
+                const parts = info.split(' | ');
+                const name = parts[0];
+                const details = parts.slice(1, parts.length - 1).join(' | ');
+                const epicQuote = parts[parts.length - 1];
+                
+                popupName.textContent = name;
+                popupDetails.textContent = details;
+                popupImage.src = jugador.src; 
+                popupEpicQuote.textContent = `"${epicQuote}"`;
+
+                // Activa la animación del popup
+                popupOverlay.classList.add("active");
+            });
+        });
+
+        function cerrarPopup() {
+            popupOverlay.classList.add("closing");
+            setTimeout(() => {
+                popupOverlay.classList.remove("active", "closing");
+            }, 600); // Duración de la animación de salida
+        }
+
+        closeBtn.addEventListener("click", cerrarPopup);
+
+        popupOverlay.addEventListener("click", (e) => {
+            if (e.target === popupOverlay) {
+                cerrarPopup();
+            }
+        });
+
+        // Código de las serpentinas
+        const serpentinasContainerBehind = document.getElementById('serpentinas-container-behind');
+        const serpentinasContainerFront = document.getElementById('serpentinas-container-front');
+        const colors = ['#FECB00', '#00205B', '#D50A0A'];
+        const numSerpentinasBehind = 70;
+        const numSerpentinasFront = 10;
+
+        function createSerpentina(container) {
+            const serpentina = document.createElement('div');
+            serpentina.classList.add('serpentina-cubo');
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            serpentina.style.backgroundColor = randomColor;
+            const startX = Math.random() * 100 + 'vw';
+            const duration = Math.random() * 8 + 10 + 's';
+            const delay = Math.random() * 15 + 's';
+            const rotationStart = Math.random() * 360 + 'deg';
+            const rotationEnd = Math.random() * 360 + 720 + 'deg';
+            serpentina.style.left = startX;
+            serpentina.style.animationDuration = duration;
+            serpentina.style.animationDelay = delay;
+            serpentina.style.setProperty('--rotation-start', rotationStart);
+            serpentina.style.setProperty('--rotation-end', rotationEnd);
+            serpentina.style.setProperty('--rotation', Math.random() * 360 + 'deg');
+            container.appendChild(serpentina);
+            serpentina.addEventListener('animationend', () => {
+                serpentina.remove();
+                createSerpentina(container);
+            });
+        }
+        for (let i = 0; i < numSerpentinasBehind; i++) {
+            createSerpentina(serpentinasContainerBehind);
+        }
+        for (let i = 0; i < numSerpentinasFront; i++) {
+            createSerpentina(serpentinasContainerFront);
+        }
+    </script>
+</body>
+</html>

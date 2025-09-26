@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA - El Fútbol Global</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+        /* Colores FIFA: Dark Blue (#002D72), Gold (#FFD700), Black/White */
+        :root {
+            --color-primary: #002D72; /* Azul Oscuro (FIFA) */
+            --color-secondary: #FFD700; /* Dorado/Oro */
+            --color-text: #FFFFFF;
+            --color-background: #121212; /* Negro muy oscuro */
+            --color-card: #1e1e1e;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Contenedor principal para el fondo animado */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, var(--color-background), var(--color-primary), var(--color-background), var(--color-secondary));
+            background-size: 400% 400%;
+            animation: gradient-animation 20s ease infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Serpentinas / Partículas de Fondo */
+        .serpentinas-cubo {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            opacity: 0.8;
+            border-radius: 1px;
+            background-color: var(--color-secondary);
+            animation: fall-cubo linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes fall-cubo {
+            0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            100% { transform: translateY(110vh) rotateZ(720deg); opacity: 0; }
+        }
+
+        /* ------------------ ENCABEZADO Y HERO ------------------ */
+
+        header {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 3px solid var(--color-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        nav a {
+            color: var(--color-text);
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 5px 10px;
+            transition: color 0.3s, background-color 0.3s;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            color: var(--color-primary);
+            background-color: var(--color-secondary);
+        }
+
+        .hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 50px;
+            background: url('https://via.placeholder.com/1920x800/000000/FFFFFF?text=FIFA+Stadium+Background') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero h1, .hero p {
+            z-index: 5;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            color: var(--color-secondary);
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(0, 45, 114, 0.9);
+        }
+
+        main {
+            padding: 50px 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: var(--color-primary);
+            border-bottom: 4px solid var(--color-secondary);
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .content-card {
+            background-color: var(--color-card);
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        /* ------------------ SECCIÓN PANORAMA DE CLUBES (NUEVA) ------------------ */
+
+        .map-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Simulación del mapa mundi (Barra de continentes) */
+        .continent-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background-color: var(--color-primary);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .continent-nav button {
+            background-color: var(--color-card);
+            color: var(--color-text);
+            border: 2px solid var(--color-card);
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+            outline: none;
+        }
+
+        .continent-nav button:hover,
+        .continent-nav button.active {
+            background-color: #00409E; /* Azul más claro */
+            border-color: var(--color-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 0 10px var(--color-secondary);
+        }
+
+        /* Grid de Clubes */
+        .clubes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .club-card {
+            display: block;
+            background-color: var(--color-card);
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s, border-color 0.3s, transform 0.2s, opacity 0.4s;
+            opacity: 1;
+        }
+
+        .club-card:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-secondary);
+            transform: scale(1.05);
+        }
+        
+        /* Estilo para tarjetas ocultas */
+        .club-card.hidden {
+            display: none;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .club-card span {
+            display: block;
+            font-size: 0.8em;
+            color: #ccc;
+        }
+
+        /* ------------------ FOOTER ------------------ */
+        footer {
+            background-color: #000000;
+            color: #999999;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 3px solid var(--color-secondary);
+        }
+        
+        footer p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-background"></div>
+    <div id="serpentinas-container"></div>
+
+    <header>
+        <nav>
+            <a href="#inicio">FIFA</a>
+            <a href="#quienes-somos">Quiénes Somos</a>
+            <a href="#torneos">Torneos</a>
+            <a href="#clubes">Panorama de Clubes</a>
+        </nav>
+    </header>
+
+    <div class="hero" id="inicio">
+        <h1>UNIDOS POR EL FÚTBOL GLOBAL</h1>
+        <p>Gobernamos, desarrollamos y promovemos el deporte más hermoso del mundo para el beneficio de todos. Llevando el juego a cada rincón del planeta.</p>
+    </div>
+
+    <main>
+        <section id="quienes-somos">
+            <h2>Quiénes Somos</h2>
+            <div class="content-card">
+                <p>La **Federación Internacional de Fútbol Asociación (FIFA)** es el organismo rector mundial del fútbol. Fundada en 1904, nuestra misión es regir el fútbol, mejorando constantemente el juego y asegurando que sea accesible para todos.</p>
+                <p>Nuestra visión se centra en **hacer el fútbol verdaderamente global**, promoviendo la integridad, la transparencia y el desarrollo sostenible de las 211 asociaciones miembro, garantizando que el futuro del fútbol se base en valores sólidos de equidad e inclusión.</p>
+                <p>Actuamos como custodios del espíritu del juego, invirtiendo miles de millones en infraestructura y proyectos sociales a través del programa **Forward**.</p>
+            </div>
+        </section>
+
+        <section id="torneos">
+            <h2>Nuestros Torneos Globales</h2>
+            <div class="content-card torneos-grid">
+                <div class="torneo-item">
+                    <h3>Copa Mundial de la FIFA™</h3>
+                    <p>La máxima competición del fútbol, uniendo al mundo cada cuatro años en la celebración deportiva más vista.</p>
+                </div>
+                <div class="torneo-item">
+                    <h3>Copa Mundial Femenina™</h3>
+                    <p>Impulsando el crecimiento exponencial del fútbol femenino, demostrando el talento y la pasión de las atletas globales.</p>
+                </div>
+                <div class="torneo-item">
+                    <h3>Copa Mundial de Clubes FIFA™</h3>
+                    <p>El escenario donde los campeones continentales se enfrentan para ser coronados como el mejor club del planeta.</p>
+                </div>
+                <div class="torneo-item">
+                    <h3>Torneos Juveniles y Futsal</h3>
+                    <p>Invertimos en el futuro con las Copas Mundiales Sub-17 y Sub-20, y promovemos el fútbol sala y playa a nivel internacional.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="clubes">
+            <h2>Panorama Global de Clubes Representativos</h2>
+            <div class="map-container">
+                <p>Seleccione una confederación para ver sus clubes más representativos:</p>
+                <div class="continent-nav">
+                    <button data-continent="all" class="active">Mundo (Todos)</button>
+                    <button data-continent="UEFA">UEFA (Europa)</button>
+                    <button data-continent="CONMEBOL">CONMEBOL (Sudamérica)</button>
+                    <button data-continent="CONCACAF">CONCACAF (Norte/Centroamérica)</button>
+                    <button data-continent="CAF">CAF (África)</button>
+                    <button data-continent="AFC">AFC (Asia)</button>
+                </div>
+            </div>
+            
+            <div class="clubes-grid">
+                <a href="arsenal.html" class="club-card" data-continent="UEFA">Arsenal FC <span>Inglaterra</span></a>
+                <a href="atletico.html" class="club-card" data-continent="UEFA">Atlético de Madrid <span>España</span></a>
+                <a href="barcelona.html" class="club-card" data-continent="UEFA">FC Barcelona <span>España</span></a>
+                <a href="bayern.html" class="club-card" data-continent="UEFA">Bayern Múnich <span>Alemania</span></a>
+                <a href="borussia.html" class="club-card" data-continent="UEFA">Borussia Dortmund <span>Alemania</span></a>
+                <a href="chelsea.html" class="club-card" data-continent="UEFA">Chelsea FC <span>Inglaterra</span></a>
+                <a href="inter.html" class="club-card" data-continent="UEFA">Inter de Milán <span>Italia</span></a>
+                <a href="juventus.html" class="club-card" data-continent="UEFA">Juventus FC <span>Italia</span></a>
+                <a href="liverpool.html" class="club-card" data-continent="UEFA">Liverpool FC <span>Inglaterra</span></a>
+                <a href="madrid.html" class="club-card" data-continent="UEFA">Real Madrid CF <span>España</span></a>
+                <a href="manchester.html" class="club-card" data-continent="UEFA">Manchester Utd <span>Inglaterra</span></a>
+                <a href="mancity.html" class="club-card" data-continent="UEFA">Manchester City <span>Inglaterra</span></a>
+                <a href="milan.html" class="club-card" data-continent="UEFA">AC Milan <span>Italia</span></a>
+                <a href="psg.html" class="club-card" data-continent="UEFA">PSG <span>Francia</span></a>
+                <a href="ajax.html" class="club-card" data-continent="UEFA">Ajax Ámsterdam <span>Países Bajos</span></a>
+
+                <a href="boca.html" class="club-card" data-continent="CONMEBOL">Boca Juniors <span>Argentina</span></a>
+                <a href="flamengo.html" class="club-card" data-continent="CONMEBOL">Flamengo <span>Brasil</span></a>
+                <a href="fluminense.html" class="club-card" data-continent="CONMEBOL">Fluminense <span>Brasil</span></a>
+                <a href="palmeiras.html" class="club-card" data-continent="CONMEBOL">Palmeiras <span>Brasil</span></a>
+
+                <a href="clubamerica.html" class="club-card" data-continent="CONCACAF">Club América <span>México</span></a>
+                <a href="tigres.html" class="club-card" data-continent="CONCACAF">Tigres UANL <span>México</span></a>
+
+                <a href="alahly.html" class="club-card" data-continent="CAF">Al Ahly SC <span>Egipto</span></a>
+
+                <a href="alhilal.html" class="club-card" data-continent="AFC">Al-Hilal SFC <span>Arabia Saudita</span></a>
+                <a href="urawared.html" class="club-card" data-continent="AFC">Urawa R. Diamonds <span>Japón</span></a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 FIFA - Federación Internacional de Fútbol Asociación.</p>
+        <p>Para el juego, para el mundo.</p>
+    </footer>
+
+    <script>
+        // --- CÓDIGO INTERACTIVO PARA FILTRAR POR CONTINENTE ---
+        const continentButtons = document.querySelectorAll('.continent-nav button');
+        const clubCards = document.querySelectorAll('.club-card');
+
+        function filterClubs(continent) {
+            clubCards.forEach(card => {
+                const cardContinent = card.getAttribute('data-continent');
+                // Si el continente es 'all' o coincide con el continente de la tarjeta, la muestra.
+                if (continent === 'all' || cardContinent === continent) {
+                    card.style.display = 'block';
+                    // Pequeño timeout para manejar la transición CSS de reaparición
+                    setTimeout(() => {
+                        card.classList.remove('hidden');
+                    }, 50); 
+                } else {
+                    card.classList.add('hidden');
+                    // Retrasamos la eliminación de 'display: block' para que la animación de opacidad se vea
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 400); 
+                }
+            });
+        }
+
+        continentButtons.forEach(button => {
+            // Manejador de clic para activar la función de filtrado
+            button.addEventListener('click', () => {
+                const continent = button.getAttribute('data-continent');
+                
+                // Actualiza el estado activo de los botones
+                continentButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                filterClubs(continent);
+            });
+
+            // Opcional: Manejador de hover (simulación del mapa)
+            button.addEventListener('mouseover', (e) => {
+                if (!button.classList.contains('active')) {
+                    button.style.borderColor = '#ffffff'; // Muestra hover no-activo
+                }
+            });
+            button.addEventListener('mouseout', (e) => {
+                if (!button.classList.contains('active')) {
+                    button.style.borderColor = 'var(--color-card)';
+                }
+            });
+        });
+
+        // Inicializa la vista mostrando todos los clubes al cargar
+        filterClubs('all');
+
+
+        // --- CÓDIGO DE PARTÍCULAS DE FONDO (MANTENIDO) ---
+        const serpentinasContainer = document.getElementById('serpentinas-container');
+        const colors = ['#ffffff', '#FFD700', '#002D72'];
+        const numSerpentinas = 80;
+
+        function createSerpentina() {
+            const serpentina = document.createElement('div');
+            serpentina.classList.add('serpentinas-cubo');
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            serpentina.style.backgroundColor = randomColor;
+            const startX = Math.random() * 100 + 'vw';
+            const duration = Math.random() * 10 + 15 + 's';
+            const delay = Math.random() * 25 + 's';
+            
+            serpentina.style.left = startX;
+            serpentina.style.animationDuration = duration;
+            serpentina.style.animationDelay = delay;
+            serpentina.style.setProperty('--rotation-start', Math.random() * 360 + 'deg');
+            serpentina.style.setProperty('--rotation-end', Math.random() * 360 + 720 + 'deg');
+            
+            serpentinasContainer.appendChild(serpentina);
+            
+            serpentina.addEventListener('animationend', () => {
+                serpentina.remove();
+                createSerpentina();
+            });
+        }
+        
+        for (let i = 0; i < numSerpentinas; i++) {
+            createSerpentina();
+        }
+    </script>
+</body>
+</html>
